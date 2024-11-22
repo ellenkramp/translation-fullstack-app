@@ -1,0 +1,13 @@
+{
+  "name": "@tfa/translate",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "devDependencies": {
+    "@types/node": "22.7.9",
+    "ts-node": "^10.9.2",
+    "@tfa/shared-types": "*",
+    "aws-lambda": "^1.0.7",
+    "@types/aws-lambda": "^8.10.145",
+    "@aws-sdk/client-translate": "^3.696.0"
+  }
+}

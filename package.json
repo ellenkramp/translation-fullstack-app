@@ -1,0 +1,20 @@
+{
+  "name": "translation-fullstack-app",
+  "version": "1.0.0",
+  "description": "full stack app",
+  "author": "Ellen Kramp",
+  "license": "ISC",
+  "scripts": {
+    "frontend-dev": "npm run dev --workspace=@tfa/translation-app",
+    "deploy": "cd infrastructure; cdk deploy -f --require-approval never"
+  },
+  "workspaces": [
+    "apps/*",
+    "infrastructure",
+    "packages/**"
+  ],
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  },
+  "private": true
+}

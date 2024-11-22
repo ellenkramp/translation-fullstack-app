@@ -1,0 +1,4 @@
+{
+  "name": "@tfa/shared-types",
+  "types": "./src/index.d.ts"
+}
