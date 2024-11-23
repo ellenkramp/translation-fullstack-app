@@ -1,5 +1,0 @@
-[submodule "infrastructure"]
-    path = infrastructure
-
-[submodule "translation-app"]
-    path = apps/translation-app
