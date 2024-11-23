@@ -6,7 +6,8 @@
   "license": "ISC",
   "scripts": {
     "frontend-dev": "npm run dev --workspace=@tfa/translation-app",
-    "deploy": "cd infrastructure; cdk deploy -f --require-approval never"
+    "deploy": "cd infrastructure; cdk deploy -f --require-approval never",
+    "build-utils-lambda-layer": "npm run build --workspace=@tfa/utils-lambda-layer"
   },
   "workspaces": [
     "apps/*",
