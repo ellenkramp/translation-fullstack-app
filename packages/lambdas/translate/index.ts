@@ -1,18 +1,15 @@
-import * as dynamodb from "@aws-sdk/client-dynamodb";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import * as lambda from "aws-lambda";
 import {
   gateway,
   getTranslation,
   exception,
+  TranslationTable,
 } from "/opt/nodejs/utils-lambda-layer";
 import {
   ITranslateDBObject,
   ITranslateRequest,
   ITranslateResponse,
 } from "@tfa/shared-types";
-
-const dynamodbClient = new dynamodb.DynamoDBClient({});
 
 const { TRANSLATION_TABLE_NAME, TRANSLATION_PARTITION_KEY } = process.env;
 
@@ -23,6 +20,11 @@ if (!TRANSLATION_TABLE_NAME) {
 if (!TRANSLATION_PARTITION_KEY) {
   throw new exception.MissingEnvironmentVariable("TRANSLATION_PARTITION_KEY");
 }
+
+const translateTable = new TranslationTable({
+  tableName: TRANSLATION_TABLE_NAME,
+  partitionKey: TRANSLATION_PARTITION_KEY,
+});
 
 export const translate: lambda.APIGatewayProxyHandler = async function (
   event: lambda.APIGatewayProxyEvent,
@@ -58,19 +60,13 @@ export const translate: lambda.APIGatewayProxyHandler = async function (
       targetText: res.TranslatedText,
     };
 
-    // save
     const tableObj: ITranslateDBObject = {
       ...body,
       ...returnData,
       requestId: context.awsRequestId,
     };
 
-    const tableInsertCommand: dynamodb.PutItemCommandInput = {
-      TableName: TRANSLATION_TABLE_NAME,
-      Item: marshall(tableObj),
-    };
-
-    await dynamodbClient.send(new dynamodb.PutItemCommand(tableInsertCommand));
+    await translateTable.insert(tableObj);
 
     return gateway.createSuccessJsonResponse(returnData);
   } catch (e: any) {
@@ -84,22 +80,7 @@ export const getTranslations: lambda.APIGatewayProxyHandler = async function (
   context: lambda.Context
 ) {
   try {
-    const scanCommand: dynamodb.ScanCommandInput = {
-      TableName: TRANSLATION_TABLE_NAME,
-    };
-
-    const { Items } = await dynamodbClient.send(
-      new dynamodb.ScanCommand(scanCommand)
-    );
-
-    if (!Items) {
-      throw new exception.MissingParams("Items");
-    }
-
-    const returnData = Items.map(
-      (item) => unmarshall(item) as ITranslateDBObject
-    );
-
+    const returnData = await translateTable.getAll();
     return gateway.createSuccessJsonResponse(returnData);
   } catch (e: any) {
     console.error(e);
