@@ -32,7 +32,7 @@ const translateText = async ({
     const returnValue = (await result.json()) as ITranslateResponse;
 
     return returnValue;
-  } catch (e: any) {
+  } catch (e) {
     throw e;
   }
 };
@@ -46,7 +46,7 @@ const getTranslations = async () => {
     const returnValue = (await result.json()) as Array<ITranslateDBObject>;
 
     return returnValue;
-  } catch (e: any) {
+  } catch (e) {
     throw e;
   }
 };
