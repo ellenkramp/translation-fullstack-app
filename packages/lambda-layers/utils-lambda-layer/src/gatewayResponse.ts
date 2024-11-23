@@ -19,8 +19,8 @@ const createGatewayResponse = ({
   };
 };
 
-export const createSuccessJsonResponse = (body: string) =>
+export const createSuccessJsonResponse = (body: object) =>
   createGatewayResponse({ statusCode: 200, body: JSON.stringify(body) });
 
-export const createErrorJsonResponse = (body: string) =>
+export const createErrorJsonResponse = (body: object) =>
   createGatewayResponse({ statusCode: 500, body: JSON.stringify(body) });
