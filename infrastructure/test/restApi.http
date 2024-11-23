@@ -1,0 +1,17 @@
+@URL=https://5yni41id8g.execute-api.us-east-1.amazonaws.com/prod/
+
+POST {{URL}} HTTP/1.1
+Content-Type: application/json
+Accept: "application/json"
+
+{
+    "sourceLang": "en",
+    "targetLang": "ru",
+    "sourceText": "walk"
+}
+
+###
+
+GET {{URL}} HTTP/1.1
+Content-Type: application/json
+Accept: "application/json"
