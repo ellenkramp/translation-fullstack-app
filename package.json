@@ -7,10 +7,10 @@
   "scripts": {
     "frontend:dev": "npm run dev --workspace=@tfa/translation-app",
     "frontend:build": "npm run build --workspace=@tfa/translation-app",
-    "deploy": "cd infrastructure; cdk deploy -f --require-approval never",
-    "destroy": "cd infrastructure; cdk destroy -f --require-approval never",
-    "build-utils-lambda-layer": "npm run build --workspace=@tfa/utils-lambda-layer",
-    "watch-utils-lambda-layer": "npm run watch --workspace=@tfa/utils-lambda-layer"
+    "cdk:deploy": "cd infrastructure; cdk deploy -f --require-approval never",
+    "cdk:destroy": "cd infrastructure; cdk destroy -f --require-approval never",
+    "lambda-layer:build-utils": "npm run build --workspace=@tfa/utils-lambda-layer",
+    "lambda-layer:watch-utils": "npm run watch --workspace=@tfa/utils-lambda-layer"
   },
   "workspaces": [
     "apps/*",
