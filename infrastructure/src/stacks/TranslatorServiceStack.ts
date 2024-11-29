@@ -3,7 +3,8 @@ import { Construct } from "constructs";
 import {
   RestApiService,
   TranslationService,
-  StaticWebsiteDeplyment,
+  StaticWebsiteDeployment,
+  UserAuthSupportService,
 } from "../constructs";
 
 // const config = getConfig();
@@ -13,11 +14,16 @@ export class TranslatorServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const restApi = new RestApiService(this, "restApiService");
+    const userAuth = new UserAuthSupportService(this, "userAuthSupport");
+
+    const restApi = new RestApiService(this, "restApiService", {
+      userPool: userAuth.userPool,
+    });
+    
     new TranslationService(this, "translationService", {
       restApi,
     });
 
-    new StaticWebsiteDeplyment(this, "staticWebsiteDeployment");
+    new StaticWebsiteDeployment(this, "staticWebsiteDeployment");
   }
 }

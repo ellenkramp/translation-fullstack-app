@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ConfigureAmplifyClient } from "@/components";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,6 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ConfigureAmplifyClient />
+        <div className="flex gap-2 px-4 py-2 bg-orange-400">
+          <Link href="/">Home</Link>
+          <Link href="/user">User</Link>
+        </div>
         {children}
       </body>
     </html>

@@ -13,7 +13,7 @@ export interface IStaticWebsiteDeploymentProps extends cdk.StackProps {
   // zone
 }
 
-export class StaticWebsiteDeplyment extends Construct {
+export class StaticWebsiteDeployment extends Construct {
   public restApi: apigateway.RestApi;
   constructor(
     scope: Construct,
@@ -63,6 +63,8 @@ export class StaticWebsiteDeplyment extends Construct {
       sources: [s3deploy.Source.asset(frontendDistPath)],
       distribution: distro,
       distributionPaths: ["/*"],
+      // default is around 128
+      memoryLimit: 512,
     });
 
     new cdk.CfnOutput(this, "webUrl", {
