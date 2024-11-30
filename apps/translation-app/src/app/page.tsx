@@ -8,7 +8,7 @@ import {
 } from "@tfa/shared-types";
 import { fetchAuthSession } from "aws-amplify/auth";
 
-const URL = "https://lyy2g1txw5.execute-api.us-east-1.amazonaws.com/prod/";
+const URL = "https://pocq837d54.execute-api.us-east-1.amazonaws.com/prod/";
 
 const translateText = async ({
   inputLang,
