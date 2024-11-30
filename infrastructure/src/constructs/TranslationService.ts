@@ -72,7 +72,7 @@ export class TranslationService extends Construct {
 
     const translateLambda = createNodeJsLambda(this, "translateLambda", {
       lambdaRelativePath: "translate/index.ts",
-      handler: "translate",
+      handler: "userTranslate",
       initialPolicy: [translateServicePolicy, translateTablePolicy],
       lambdaLayers: [utilsLambdaLayer],
       environment,
@@ -83,7 +83,7 @@ export class TranslationService extends Construct {
 
     const getTranslations = createNodeJsLambda(this, "getTranslationsLambda", {
       lambdaRelativePath: "translate/index.ts",
-      handler: "getTranslations",
+      handler: "userGetTranslations",
       initialPolicy: [translateTablePolicy],
       lambdaLayers: [utilsLambdaLayer],
       environment,
