@@ -7,20 +7,25 @@ import { getCurrentUser, signIn, signOut } from "aws-amplify/auth";
 function Login({ onSignedIn }: { onSignedIn: () => void }) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
   return (
     <form
       onSubmit={async (event) => {
         event.preventDefault();
-        await signIn({
-          username: email,
-          password,
-          options: {
-            userAttributes: {
-              email,
+        try {
+          await signIn({
+            username: email,
+            password,
+            options: {
+              userAttributes: {
+                email,
+              },
             },
-          },
-        });
-        onSignedIn();
+          });
+          onSignedIn();
+        } catch (e: any) {
+          setError(e.toString());
+        }
       }}
     >
       <div>
@@ -46,6 +51,7 @@ function Login({ onSignedIn }: { onSignedIn: () => void }) {
       <Link className="hover:underline" href="/register">
         Register
       </Link>
+      {error && <p className="text-red-500 font-bold">{error}</p>}
     </form>
   );
 }
@@ -72,7 +78,6 @@ export default function User() {
     async function fetchUser() {
       try {
         const curUser = await getCurrentUser();
-        console.log(curUser);
         setUser(curUser);
       } catch (e) {
         console.log(e);
@@ -91,7 +96,6 @@ export default function User() {
     <Login
       onSignedIn={async () => {
         const curUser = await getCurrentUser();
-        console.log(curUser);
         setUser(curUser);
       }}
     />

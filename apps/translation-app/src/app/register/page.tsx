@@ -22,6 +22,7 @@ function RegistrationForm({
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [password2, setPassword2] = useState<string>("");
+  const [error, setError] = useState<string>("");
   return (
     <form
       onSubmit={async (event) => {
@@ -41,10 +42,9 @@ function RegistrationForm({
             },
           });
 
-          console.log("SIGNUP STEP", nextStep.signUpStep);
           onStepChange(nextStep);
-        } catch (e) {
-          console.log(JSON.stringify(e));
+        } catch (e: any) {
+          setError(e.toString());
         }
       }}
     >
@@ -79,6 +79,7 @@ function RegistrationForm({
       <Link className="hover:underline" href="/user">
         Login
       </Link>
+      {error && <p className="text-red-500 font-bold">{error}</p>}
     </form>
   );
 }
@@ -91,7 +92,6 @@ function AutoSignIn({
   useEffect(() => {
     const asyncSignIn = async () => {
       const { nextStep } = await autoSignIn();
-      console.log("NEXT STEP ", nextStep);
       onStepChange(nextStep);
     };
     asyncSignIn();
@@ -107,6 +107,7 @@ function ConfirmationForm({
 }) {
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   return (
     <form
@@ -118,10 +119,9 @@ function ConfirmationForm({
             username: email,
           });
 
-          console.log("SIGNUP STEP", nextStep.signUpStep);
           onStepChange(nextStep);
-        } catch (e) {
-          console.log(JSON.stringify(e));
+        }  catch (e: any) {
+          setError(e.toString());
         }
       }}
     >
@@ -146,6 +146,7 @@ function ConfirmationForm({
       <button className="btn bg-blue-500 p-2 mt-2 rounded-xl" type="submit">
         Confirm
       </button>
+      {error && <p className="text-red-500 font-bold">{error}</p>}
     </form>
   );
 }

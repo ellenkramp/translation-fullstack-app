@@ -120,6 +120,7 @@ export default function Home() {
   const [translations, setTranslations] = useState<Array<ITranslateDBObject>>(
     []
   );
+  const [error, setError] = useState<string>("");
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <form
@@ -138,13 +139,12 @@ export default function Home() {
             } else {
               throw new Error("user not logged in");
             }
-          } catch (e) {
+          } catch (e: any) {
             res = await translatePublicText({
               inputText,
               inputLang,
               outputLang,
             });
-            console.log(e);
           }
           setOutputText(res);
         }}
@@ -183,8 +183,12 @@ export default function Home() {
       <button
         className="btn bg-blue-500 p-2 mt-2 rounded-xl"
         onClick={async () => {
-          const res = await getUserTranslations();
-          setTranslations(res);
+          try {
+            const res = await getUserTranslations();
+            setTranslations(res);
+          } catch (e: any) {
+            setError(e.toString());
+          }
         }}
       >
         get old transations
@@ -208,8 +212,8 @@ export default function Home() {
                 try {
                   const returnValue = await deleteUserTranslation(t.requestId);
                   setTranslations(returnValue);
-                } catch (e) {
-                  console.log(e);
+                } catch (e: any) {
+                  setError(e.toString());
                 }
               }}
             >
@@ -218,6 +222,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+      {error && <p className="text-red-500 font-bold">{error}</p>}
     </main>
   );
 }
