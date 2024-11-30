@@ -79,4 +79,25 @@ export class TranslationTable {
     );
     return returnData;
   }
+
+  async delete({
+    username,
+    requestId,
+  }: {
+    username: string;
+    requestId: string;
+  }) {
+    const tableDeleteCommand: dynamodb.DeleteItemCommandInput = {
+      TableName: this.tableName,
+      Key: {
+        [this.partitionKey]: { S: username },
+        [this.sortKey]: { S: requestId },
+      },
+    };
+
+    await this.dynamodbClient.send(
+      new dynamodb.DeleteItemCommand(tableDeleteCommand)
+    );
+    return this.query({ username });
+  }
 }

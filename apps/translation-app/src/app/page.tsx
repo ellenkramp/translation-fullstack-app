@@ -8,7 +8,7 @@ import {
 } from "@tfa/shared-types";
 import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 
-const URL = "https://pocq837d54.execute-api.us-east-1.amazonaws.com/prod/";
+const URL = "https://1ml3i7bvtd.execute-api.us-east-1.amazonaws.com/prod/";
 
 const translatePublicText = async ({
   inputLang,
@@ -57,7 +57,7 @@ const translateUserText = async ({
 
     const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
 
-    const result = await fetch(URL, {
+    const result = await fetch(`${URL}/user`, {
       method: "POST",
       body: JSON.stringify(request),
       headers: {
@@ -76,8 +76,29 @@ const translateUserText = async ({
 const getUserTranslations = async () => {
   try {
     const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
-    const result = await fetch(URL, {
+    const result = await fetch(`${URL}/user`, {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    const returnValue = (await result.json()) as Array<ITranslateDBObject>;
+
+    return returnValue;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const deleteUserTranslation = async (requestId: string) => {
+  try {
+    const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
+    const body = { requestId };
+
+    const result = await fetch(`${URL}/user`, {
+      method: "DELETE",
+      body: JSON.stringify(body),
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
@@ -168,18 +189,35 @@ export default function Home() {
       >
         get old transations
       </button>
-      <pre style={{ whiteSpace: "pre-wrap" }} className="w-full">
+      <div className="flex flex-col space-y-2 p-1">
         {translations.map((t: ITranslateDBObject) => (
-          <div key={t.requestId}>
+          <div
+            className="flex flex-row justify-between bg-slate-400 space-x-2 p-1"
+            key={t.requestId}
+          >
             <p>
               {t.sourceLang}/{t.sourceText}
             </p>
             <p>
               {t.targetLang}/{t.targetText}
             </p>
+            <button
+              className="btn bg-red-500 hover:bg-red-300 rounded-md p-1"
+              type="button"
+              onClick={async () => {
+                try {
+                  const returnValue = await deleteUserTranslation(t.requestId);
+                  setTranslations(returnValue);
+                } catch (e) {
+                  console.log(e);
+                }
+              }}
+            >
+              x
+            </button>
           </div>
         ))}
-      </pre>
+      </div>
     </main>
   );
 }

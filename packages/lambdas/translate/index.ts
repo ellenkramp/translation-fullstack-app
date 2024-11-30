@@ -37,6 +37,7 @@ const translateTable = new TranslationTable({
 
 const getUsername = (event: lambda.APIGatewayProxyEvent) => {
   const claims = event.requestContext.authorizer?.claims;
+  console.log("CLAIMS ", event.requestContext);
 
   if (!claims) {
     throw new Error("user not authenticated");
@@ -98,7 +99,9 @@ export const userTranslate: lambda.APIGatewayProxyHandler = async function (
 ) {
   try {
     const username = getUsername(event);
-
+    if (!username) {
+      throw new exception.MissingParams("username");
+    }
     if (!event.body) {
       throw new exception.MissingBodyData();
     }
@@ -148,10 +151,36 @@ export const getUserTranslations: lambda.APIGatewayProxyHandler =
   async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
     try {
       const username = getUsername(event);
+      if (!username) {
+        throw new exception.MissingParams("username");
+      }
       const returnData = await translateTable.query({ username });
       return gateway.createSuccessJsonResponse(returnData);
     } catch (e: any) {
       console.error(e);
+      return gateway.createErrorJsonResponse(e);
+    }
+  };
+
+export const deleteUserTranslation: lambda.APIGatewayProxyHandler =
+  async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
+    try {
+      const username = getUsername(event);
+      if (!username) {
+        throw new exception.MissingParams("username");
+      }
+      if (!event.body) {
+        throw new exception.MissingBodyData();
+      }
+      let body = JSON.parse(event.body) as { requestId: string };
+      if (!body.requestId) {
+        throw new exception.MissingParams("requestId");
+      }
+      let requestId = body.requestId;
+      const returnData = await translateTable.delete({ username, requestId });
+      return gateway.createSuccessJsonResponse(returnData);
+    } catch (e: any) {
+      console.log(e);
       return gateway.createErrorJsonResponse(e);
     }
   };

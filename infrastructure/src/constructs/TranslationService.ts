@@ -78,21 +78,22 @@ export class TranslationService extends Construct {
       environment,
     });
 
-    // granting read & write access to db
-    table.grantReadWriteData(translateLambda);
-
-    const getTranslations = createNodeJsLambda(this, "getTranslationsLambda", {
-      lambdaRelativePath: "translate/index.ts",
-      handler: "getUserTranslations",
-      initialPolicy: [translateTablePolicy],
-      lambdaLayers: [utilsLambdaLayer],
-      environment,
-    });
+    const getUserTranslationsLambda = createNodeJsLambda(
+      this,
+      "getUserTranslationsLambda",
+      {
+        lambdaRelativePath: "translate/index.ts",
+        handler: "getUserTranslations",
+        initialPolicy: [translateTablePolicy],
+        lambdaLayers: [utilsLambdaLayer],
+        environment,
+      }
+    );
 
     restApi.addTranslateMethod({
       resource: restApi.userResource,
       httpMethod: "GET",
-      lambda: getTranslations,
+      lambda: getUserTranslationsLambda,
       isAuth: true,
     });
 
@@ -100,6 +101,25 @@ export class TranslationService extends Construct {
       resource: restApi.userResource,
       httpMethod: "POST",
       lambda: translateLambda,
+      isAuth: true,
+    });
+
+    const deleteTranslationLambda = createNodeJsLambda(
+      this,
+      "deleteTranslationLambda",
+      {
+        lambdaRelativePath: "translate/index.ts",
+        handler: "deleteUserTranslation",
+        initialPolicy: [translateTablePolicy],
+        lambdaLayers: [utilsLambdaLayer],
+        environment,
+      }
+    );
+
+    restApi.addTranslateMethod({
+      resource: restApi.userResource,
+      httpMethod: "DELETE",
+      lambda: deleteTranslationLambda,
       isAuth: true,
     });
 
