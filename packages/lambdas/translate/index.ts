@@ -57,7 +57,6 @@ export const userTranslate: lambda.APIGatewayProxyHandler = async function (
 ) {
   try {
     const username = getUsername(event);
-    console.log("USER ", username);
 
     if (!event.body) {
       throw new exception.MissingBodyData();
@@ -108,8 +107,6 @@ export const getUserTranslations: lambda.APIGatewayProxyHandler =
   async function (event: lambda.APIGatewayProxyEvent, context: lambda.Context) {
     try {
       const username = getUsername(event);
-      console.log("USER ", username);
-      // const returnData = await translateTable.getAll();
       const returnData = await translateTable.query({ username });
       return gateway.createSuccessJsonResponse(returnData);
     } catch (e: any) {
