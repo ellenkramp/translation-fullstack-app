@@ -13,6 +13,8 @@ export interface IRestApiServiceProps extends cdk.StackProps {
 export class RestApiService extends Construct {
   public restApi: apigateway.RestApi;
   public authorizer: apigateway.CognitoUserPoolsAuthorizer;
+  public publicResource: cdk.aws_apigateway.Resource;
+  public userResource: cdk.aws_apigateway.Resource;
 
   constructor(
     scope: Construct,
@@ -30,6 +32,9 @@ export class RestApiService extends Construct {
       },
     });
 
+    this.publicResource = this.restApi.root.addResource("public");
+    this.userResource = this.restApi.root.addResource("user");
+
     if (userPool) {
       this.authorizer = new apigateway.CognitoUserPoolsAuthorizer(
         this.restApi,
@@ -43,10 +48,12 @@ export class RestApiService extends Construct {
   }
 
   addTranslateMethod({
+    resource,
     httpMethod,
     lambda,
     isAuth,
   }: {
+    resource: apigateway.Resource;
     httpMethod: string;
     lambda: lambda.IFunction;
     isAuth?: boolean;
@@ -62,7 +69,7 @@ export class RestApiService extends Construct {
         authorizationType: apigateway.AuthorizationType.COGNITO,
       };
     }
-    this.restApi.root.addMethod(
+    resource.addMethod(
       httpMethod,
       new apigateway.LambdaIntegration(lambda),
       options

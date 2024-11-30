@@ -6,11 +6,40 @@ import {
   ITranslateRequest,
   ITranslateResponse,
 } from "@tfa/shared-types";
-import { fetchAuthSession } from "aws-amplify/auth";
+import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 
 const URL = "https://pocq837d54.execute-api.us-east-1.amazonaws.com/prod/";
 
-const translateText = async ({
+const translatePublicText = async ({
+  inputLang,
+  outputLang,
+  inputText,
+}: {
+  inputLang: string;
+  outputLang: string;
+  inputText: string;
+}) => {
+  try {
+    const request: ITranslateRequest = {
+      sourceLang: inputLang,
+      targetLang: outputLang,
+      sourceText: inputText,
+    };
+
+    const result = await fetch(`${URL}/public`, {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+
+    const returnValue = (await result.json()) as ITranslateResponse;
+
+    return returnValue;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const translateUserText = async ({
   inputLang,
   outputLang,
   inputText,
@@ -44,7 +73,7 @@ const translateText = async ({
   }
 };
 
-const getTranslations = async () => {
+const getUserTranslations = async () => {
   try {
     const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
     const result = await fetch(URL, {
@@ -76,12 +105,26 @@ export default function Home() {
         onSubmit={async (event) => {
           event.preventDefault();
 
-          const res = await translateText({
-            inputText,
-            inputLang,
-            outputLang,
-          });
-
+          let res = null;
+          try {
+            const user = await getCurrentUser();
+            if (user) {
+              res = await translateUserText({
+                inputText,
+                inputLang,
+                outputLang,
+              });
+            } else {
+              throw new Error("user not logged in");
+            }
+          } catch (e) {
+            res = await translatePublicText({
+              inputText,
+              inputLang,
+              outputLang,
+            });
+            console.log(e);
+          }
           setOutputText(res);
         }}
       >
@@ -119,7 +162,7 @@ export default function Home() {
       <button
         className="btn bg-blue-500 p-2 mt-2 rounded-xl"
         onClick={async () => {
-          const res = await getTranslations();
+          const res = await getUserTranslations();
           setTranslations(res);
         }}
       >
