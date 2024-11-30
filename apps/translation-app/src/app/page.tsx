@@ -6,6 +6,7 @@ import {
   ITranslateRequest,
   ITranslateResponse,
 } from "@tfa/shared-types";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 const URL = "https://lyy2g1txw5.execute-api.us-east-1.amazonaws.com/prod/";
 
@@ -24,9 +25,15 @@ const translateText = async ({
       targetLang: outputLang,
       sourceText: inputText,
     };
+
+    const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
+
     const result = await fetch(URL, {
       method: "POST",
       body: JSON.stringify(request),
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
     });
 
     const returnValue = (await result.json()) as ITranslateResponse;
@@ -39,8 +46,12 @@ const translateText = async ({
 
 const getTranslations = async () => {
   try {
+    const authToken = (await fetchAuthSession()).tokens?.idToken?.toString();
     const result = await fetch(URL, {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
     });
 
     const returnValue = (await result.json()) as Array<ITranslateDBObject>;

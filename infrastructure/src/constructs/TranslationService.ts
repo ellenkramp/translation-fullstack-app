@@ -26,6 +26,10 @@ export class TranslationService extends Construct {
     const table = new dynamoDb.Table(this, "translations", {
       tableName: "translations",
       partitionKey: {
+        name: "username",
+        type: dynamoDb.AttributeType.STRING,
+      },
+      sortKey: {
         name: "requestId",
         type: dynamoDb.AttributeType.STRING,
       },
@@ -45,6 +49,7 @@ export class TranslationService extends Construct {
         "dynamodb:Scan",
         "dynamodb:GetItem",
         "dynamodb:DeleteItem",
+        "dynamodb:Query",
       ],
       resources: ["*"],
     });
@@ -59,15 +64,18 @@ export class TranslationService extends Construct {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    const environment = {
+      TRANSLATION_TABLE_NAME: table.tableName,
+      TRANSLATION_PARTITION_KEY: "username",
+      TRANSLATION_SORT_KEY: "requestId",
+    };
+
     const translateLambda = createNodeJsLambda(this, "translateLambda", {
       lambdaRelativePath: "translate/index.ts",
       handler: "translate",
       initialPolicy: [translateServicePolicy, translateTablePolicy],
       lambdaLayers: [utilsLambdaLayer],
-      environment: {
-        TRANSLATION_TABLE_NAME: table.tableName,
-        TRANSLATION_PARTITION_KEY: "requestId",
-      },
+      environment,
     });
 
     // granting read & write access to db
@@ -78,10 +86,7 @@ export class TranslationService extends Construct {
       handler: "getTranslations",
       initialPolicy: [translateTablePolicy],
       lambdaLayers: [utilsLambdaLayer],
-      environment: {
-        TRANSLATION_TABLE_NAME: table.tableName,
-        TRANSLATION_PARTITION_KEY: "requestId",
-      },
+      environment,
     });
 
     restApi.addTranslateMethod({
